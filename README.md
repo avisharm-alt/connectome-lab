@@ -100,6 +100,27 @@ flybrain-fm build --min-synapses 1 --dimensions 64
 
 That is materially heavier in RAM and compute because the complete weight table contains an enormous number of directed edges.
 
+### Optional: train a self-supervised neural embedding model
+
+For a more explicitly neural representation-learning objective, install PyTorch:
+
+```bash
+pip install -e ".[deep]"
+```
+
+Then train source/target neuron embeddings to discriminate released synaptic edges from randomly sampled non-edges:
+
+```bash
+flybrain-fm neural-build \
+  --min-synapses 5 \
+  --dimensions 64 \
+  --epochs 5 \
+  --training-edges 2000000 \
+  --output artifacts/malecns_neural_embeddings.npz
+```
+
+On Apple Silicon, PyTorch will use MPS automatically when available. The resulting embeddings plug into the same biological probes and nearest-neuron search below.
+
 ## 3. Ask whether the wiring embeddings learned biology
 
 Probe a biological annotation column:
