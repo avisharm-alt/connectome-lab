@@ -1,6 +1,11 @@
-"""Graph machine learning and robustness analysis for neural connectomes."""
+"""Graph ML and representation learning for neural connectomes."""
 
 from .embeddings import directed_spectral_embedding
+from .flybrain_fm import (
+    build_sparse_connectome,
+    fit_connectome_embeddings,
+    nearest_neurons,
+)
 from .io import load_edge_list
 from .metrics import graph_metrics, node_metrics
 from .ml import link_prediction_benchmark, node_classification_probe
@@ -9,6 +14,9 @@ from .synthetic import modular_connectome
 
 __all__ = [
     "directed_spectral_embedding",
+    "build_sparse_connectome",
+    "fit_connectome_embeddings",
+    "nearest_neurons",
     "load_edge_list",
     "graph_metrics",
     "node_metrics",
@@ -17,4 +25,4 @@ __all__ = [
     "lesion_benchmark",
     "modular_connectome",
 ]
-__version__ = "0.2.0"
+__version__ = "0.3.0"
