@@ -7,6 +7,8 @@ dist/
 build/
 *.egg-info/
 results/
+artifacts/
 data/private/
+data/malecns-v1.0/raw/
 .env
 .DS_Store
