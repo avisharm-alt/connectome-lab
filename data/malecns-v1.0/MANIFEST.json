@@ -1,0 +1,22 @@
+{
+  "dataset": "MaleCNS",
+  "version": "v1.0",
+  "license": "CC-BY",
+  "project": "https://male-cns.janelia.org/",
+  "download_documentation": "https://male-cns.janelia.org/download/",
+  "neuprint_dataset": "male-cns:v1.0",
+  "files": {
+    "annotations": {
+      "url": "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/body-annotations-male-cns-v1.0-minconf-0.5.feather",
+      "approx_size": "13 MB"
+    },
+    "neurotransmitters": {
+      "url": "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/body-neurotransmitters-male-cns-v1.0.feather",
+      "approx_size": "42 MB"
+    },
+    "connectivity": {
+      "url": "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/connectome-weights-male-cns-v1.0-minconf-0.5.feather",
+      "approx_size": "1.1 GB"
+    }
+  }
+}
