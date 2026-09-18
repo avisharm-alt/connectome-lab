@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "connectome-lab"
-version = "0.3.0"
-description = "Graph ML and representation learning on the complete MaleCNS fruit-fly connectome"
+version = "0.4.0"
+description = "Self-supervised graph ML on the complete MaleCNS fruit-fly connectome"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -23,6 +23,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "ruff>=0.6"]
 neuprint = ["neuprint-python>=0.6.3"]
+deep = ["torch>=2.2"]
 
 [project.scripts]
 connectome-lab = "connectome_lab.cli:main"
