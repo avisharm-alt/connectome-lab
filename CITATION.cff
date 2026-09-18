@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the repository."
+title: "connectome-lab"
+version: 0.1.0
+authors:
+  - family-names: Sharma
+    given-names: Avin
+date-released: 2026-09-18
+license: MIT
+repository-code: "https://github.com/avisharm-alt/connectome-lab"
