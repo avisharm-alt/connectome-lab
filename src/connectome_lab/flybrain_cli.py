@@ -5,13 +5,23 @@ import json
 from pathlib import Path
 
 from .flybrain_fm import (
-    ANNOTATION_FILE,
     FlyBrainEmbedding,
     build_sparse_connectome,
     fit_connectome_embeddings,
     nearest_neurons,
     probe_annotations,
 )
+
+
+def _graph_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--data-dir",
+        type=Path,
+        default=Path("data/malecns-v1.0/raw"),
+    )
+    parser.add_argument("--min-synapses", type=int, default=5)
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--max-edges", type=int)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -21,20 +31,31 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sub = p.add_subparsers(dest="command", required=True)
 
-    build = sub.add_parser("build", help="build sparse graph and fit neuron embeddings")
-    build.add_argument(
-        "--data-dir",
-        type=Path,
-        default=Path("data/malecns-v1.0/raw"),
-    )
-    build.add_argument("--min-synapses", type=int, default=5)
+    build = sub.add_parser("build", help="fit fast sparse SVD connectome embeddings")
+    _graph_args(build)
     build.add_argument("--dimensions", type=int, default=64)
-    build.add_argument("--seed", type=int, default=0)
-    build.add_argument("--max-edges", type=int)
     build.add_argument(
         "--output",
         type=Path,
         default=Path("artifacts/malecns_embeddings.npz"),
+    )
+
+    neural = sub.add_parser(
+        "neural-build",
+        help="train self-supervised neural embeddings from real vs negative edges",
+    )
+    _graph_args(neural)
+    neural.add_argument("--dimensions", type=int, default=64)
+    neural.add_argument("--epochs", type=int, default=5)
+    neural.add_argument("--batch-size", type=int, default=65_536)
+    neural.add_argument("--negatives", type=int, default=3)
+    neural.add_argument("--training-edges", type=int, default=2_000_000)
+    neural.add_argument("--learning-rate", type=float, default=1e-2)
+    neural.add_argument("--device", default="auto")
+    neural.add_argument(
+        "--output",
+        type=Path,
+        default=Path("artifacts/malecns_neural_embeddings.npz"),
     )
 
     probe = sub.add_parser("probe", help="probe biological labels from embeddings")
@@ -54,7 +75,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     args = build_parser().parse_args()
 
-    if args.command == "build":
+    if args.command in {"build", "neural-build"}:
         graph, body_ids = build_sparse_connectome(
             args.data_dir,
             min_synapses=args.min_synapses,
@@ -64,13 +85,32 @@ def main() -> None:
             f"graph: {graph.shape[0]:,} neurons, "
             f"{graph.nnz:,} retained directed edges"
         )
-        rep = fit_connectome_embeddings(
-            graph,
-            body_ids,
-            dimensions=args.dimensions,
-            seed=args.seed,
-            min_synapses=args.min_synapses,
-        )
+
+        if args.command == "build":
+            rep = fit_connectome_embeddings(
+                graph,
+                body_ids,
+                dimensions=args.dimensions,
+                seed=args.seed,
+                min_synapses=args.min_synapses,
+            )
+        else:
+            from .neural_embed import train_neural_edge_embeddings
+
+            rep = train_neural_edge_embeddings(
+                graph,
+                body_ids,
+                dimensions=args.dimensions,
+                epochs=args.epochs,
+                batch_size=args.batch_size,
+                negatives=args.negatives,
+                max_positive_edges=args.training_edges,
+                learning_rate=args.learning_rate,
+                seed=args.seed,
+                min_synapses=args.min_synapses,
+                device=args.device,
+            )
+
         rep.save(args.output)
         print(f"saved {rep.embeddings.shape} embeddings -> {args.output}")
 
